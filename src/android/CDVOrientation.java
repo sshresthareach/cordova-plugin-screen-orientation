@@ -30,6 +30,7 @@ import org.json.JSONException;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.util.Log;
+import android.content.res.Configuration;
 
 public class CDVOrientation extends CordovaPlugin {
     
