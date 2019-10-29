@@ -62,6 +62,17 @@ public class CDVOrientation extends CordovaPlugin {
         return false;
     }
     
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            // Change things
+            Log.d("ScreenOrientation", "Configuration.ORIENTATION_LANDSCAPE");
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
+            Log.d("ScreenOrientation", "Configuration.ORIENTATION_PORTRAIT");
+        }
+    }
+    
     private boolean routeScreenOrientation(JSONArray args, CallbackContext callbackContext) {
         
         String action = args.optString(0);
