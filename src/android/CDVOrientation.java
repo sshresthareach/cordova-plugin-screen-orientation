@@ -68,10 +68,10 @@ public class CDVOrientation extends CordovaPlugin {
         super.onConfigurationChanged(newConfig);
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             // Change things
-            this.webView.setRotation(0f);
+            this.webView.getView().setRotation(0f);
             Log.d("ScreenOrientation", "Configuration.ORIENTATION_LANDSCAPE");
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
-            this.webView.setRotation(90f);
+            this.webView.getView().setRotation(90f);
             Log.d("ScreenOrientation", "Configuration.ORIENTATION_PORTRAIT");
         }
     }
