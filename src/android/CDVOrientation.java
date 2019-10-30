@@ -24,18 +24,20 @@ package cordova.plugins.screenorientation;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 
+import org.apache.cordova.CordovaWebView;
 import org.json.JSONArray;
-import org.json.JSONException;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
+import android.util.DisplayMetrics;
 import android.util.Log;
-import android.content.res.Configuration;
+import android.view.Gravity;
+import android.widget.FrameLayout;
 
 public class CDVOrientation extends CordovaPlugin {
     
-    private static final String TAG = "YoikScreenOrientation"; 
-    
+    private static final String TAG = "YoikScreenOrientation";
+    private CallbackContext context;
     /**
      * Screen Orientation Constants
      */
@@ -52,7 +54,7 @@ public class CDVOrientation extends CordovaPlugin {
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) {
         
         Log.d(TAG, "execute action: " + action);
-        
+        this.context = callbackContext;
         // Route the Action
         if (action.equals("screenOrientation")) {
             return routeScreenOrientation(args, callbackContext);
@@ -62,51 +64,66 @@ public class CDVOrientation extends CordovaPlugin {
         callbackContext.error("action not recognised");
         return false;
     }
-    
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            // Change things
-            this.webView.getView().setRotation(0f);
-            Log.d("ScreenOrientation", "Configuration.ORIENTATION_LANDSCAPE");
-        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
-            this.webView.getView().setRotation(90f);
-            Log.d("ScreenOrientation", "Configuration.ORIENTATION_PORTRAIT");
-        }
-    }
-    
+
     private boolean routeScreenOrientation(JSONArray args, CallbackContext callbackContext) {
+
         
         String action = args.optString(0);
-        
-        
         
         String orientation = args.optString(1);
         
         Log.d(TAG, "Requested ScreenOrientation: " + orientation);
-        
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        this.webView.getView().getDisplay().getMetrics(displayMetrics);
+        int height = displayMetrics.heightPixels;
+        int width = displayMetrics.widthPixels;
+
         Activity activity = cordova.getActivity();
+
         
         if (orientation.equals(ANY)) {
             activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         } else if (orientation.equals(LANDSCAPE_PRIMARY)) {
-            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            // activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE);
+            this.webView.getView().setRotation(0f);
+            this.resizeView(width, height);
         } else if (orientation.equals(PORTRAIT_PRIMARY)) {
-            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            this.webView.getView().setRotation(90f);
+            this.resizeView(height, width);
         } else if (orientation.equals(LANDSCAPE)) {
             activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         } else if (orientation.equals(PORTRAIT)) {
             activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
         } else if (orientation.equals(LANDSCAPE_SECONDARY)) {
-            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+//            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+            this.webView.getView().setRotation(180f);
+            this.resizeView(width, height);
         } else if (orientation.equals(PORTRAIT_SECONDARY)) {
-            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
+//            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
+            this.webView.getView().setRotation(270f);
+            this.resizeView(height, width);
         }
         
         callbackContext.success();
         return true;
-        
-        
+    }
+
+    private void resizeView(int width, int height){
+        class ViewResizeTask implements Runnable {
+            CordovaWebView webView;
+
+            ViewResizeTask(CordovaWebView paramView, int width, int height) {
+                webView = paramView;
+            }
+
+            public void run() {
+                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(height, width, Gravity.CENTER);
+                this.webView.getView().setLayoutParams(params);
+            }
+        }
+
+        Activity activity = cordova.getActivity();
+        activity.runOnUiThread(new ViewResizeTask(this.webView, width, height));
     }
 }
