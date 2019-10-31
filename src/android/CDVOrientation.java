@@ -118,7 +118,7 @@ public class CDVOrientation extends CordovaPlugin {
             }
 
             public void run() {
-                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(height, width, Gravity.CENTER);
+                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, height, Gravity.CENTER);
                 this.webView.getView().setLayoutParams(params);
             }
         }
