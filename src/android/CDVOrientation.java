@@ -36,7 +36,7 @@ import android.widget.FrameLayout;
 
 public class CDVOrientation extends CordovaPlugin {
     
-    private static final String TAG = "YoikScreenOrientation";
+    private static final String TAG = "REACHLog: ";
     private CallbackContext context;
     /**
      * Screen Orientation Constants
@@ -53,7 +53,7 @@ public class CDVOrientation extends CordovaPlugin {
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) {
         
-        Log.d(TAG, "execute action: " + action);
+        Log.d(TAG, "Execute action: " + action);
         this.context = callbackContext;
         // Route the Action
         if (action.equals("screenOrientation")) {
@@ -67,7 +67,6 @@ public class CDVOrientation extends CordovaPlugin {
 
     private boolean routeScreenOrientation(JSONArray args, CallbackContext callbackContext) {
 
-        
         String action = args.optString(0);
         
         String orientation = args.optString(1);
@@ -75,7 +74,7 @@ public class CDVOrientation extends CordovaPlugin {
         Log.d(TAG, "Requested ScreenOrientation: " + orientation);
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
-        this.webView.getView().getDisplay().getMetrics(displayMetrics);
+        this.webView.getView().getDisplay().getRealMetrics(displayMetrics);
         int height = displayMetrics.heightPixels;
         int width = displayMetrics.widthPixels;
 
